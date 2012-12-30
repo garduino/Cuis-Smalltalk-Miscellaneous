@@ -1,4 +1,4 @@
-'From Cuis 4.0 of 21 April 2012 [latest update: #1270] on 12 May 2012 at 12:31:16 pm'!
+'From Cuis 4.1 of 12 December 2012 [latest update: #1524] on 30 December 2012 at 7:02:08 pm'!
 'Description Please enter a description for this package '!
 !classDefinition: #GSAConverter category: #GSAConverter!
 Object subclass: #GSAConverter
