@@ -1,12 +1,12 @@
-'From Cuis 4.1 of 12 December 2012 [latest update: #1576] on 8 February 2013 at 9:06:15 pm'!
+'From Cuis 4.1 of 12 December 2012 [latest update: #1576] on 8 February 2013 at 9:11:48 pm'!
 'Description Please enter a description for this package '!
-!classDefinition: #ArduinoMorph category: #ArdIrda!
+!classDefinition: #ArduinoMorph category: #'Cuis-ArdIrda'!
 RectangleLikeMorph subclass: #ArduinoMorph
 	instanceVariableNames: 'arduinoPort'
 	classVariableNames: ''
 	poolDictionaries: ''
-	category: 'ArdIrda'!
-!classDefinition: 'ArduinoMorph class' category: #ArdIrda!
+	category: 'Cuis-ArdIrda'!
+!classDefinition: 'ArduinoMorph class' category: #'Cuis-ArdIrda'!
 ArduinoMorph class
 	instanceVariableNames: ''!
 
