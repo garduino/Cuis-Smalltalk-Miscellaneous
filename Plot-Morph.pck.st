@@ -1,6 +1,6 @@
-'From Cuis 4.2 of 25 July 2013 [latest update: #1898] on 22 December 2013 at 8:02:32.50301 pm'!
+'From Cuis 4.2 of 25 July 2013 [latest update: #1898] on 23 December 2013 at 2:28:44.317074 pm'!
 'Description Please enter a description for this package'!
-!provides: 'Plot-Morph' 1 3!
+!provides: 'Plot-Morph' 1 5!
 !classDefinition: #AxesMorph category: #'Plot-Morph'!
 BorderedRectMorph subclass: #AxesMorph
 	instanceVariableNames: 'form limitMaxX limitMinX limitMaxY limitMinY title xmax xmid xmin ymax ymid ymin xAxisFormatter yAxisFormatter margin grid drawCotas'
@@ -94,6 +94,45 @@ I'm a serie of a PlotMorph!
 
 !PlotPoint commentStamp: '<historical>' prior: 0!
 PlotPoint is a point that have more data used to draw in a PlotMorph!
+
+!FormCanvas methodsFor: '*Plot-Morph' stamp: 'gsa 12/23/2013 14:21'!
+drawPolygon: vertices color: aColor borderWidth: bw borderColor: bc
+	"Generalize for the BalloonCanvas"
+	^self drawPolygon: vertices fillStyle: aColor borderWidth: bw borderColor: bc! !
+
+!FormCanvas methodsFor: '*Plot-Morph' stamp: 'gsa 12/23/2013 14:21'!
+drawPolygon: vertices fillStyle: aFillStyle borderWidth: bw borderColor: bc
+	"Fill the given polygon.
+	Note: The default implementation does not recognize any enhanced fill styles"
+	self drawPolygon: vertices color: aFillStyle borderWidth: bw borderColor: bc! !
+
+!FormCanvas methodsFor: '*Plot-Morph' stamp: 'gsa 12/23/2013 14:03'!
+image: aForm at: aPoint rule: combinationRule
+	"Note: This protocol is deprecated. Use one of the explicit image drawing messages (#paintImage, #drawImage) instead."
+	self image: aForm
+		at: aPoint
+		sourceRect: aForm boundingBox
+		rule: combinationRule.
+! !
+
+!FormCanvas methodsFor: '*Plot-Morph' stamp: 'gsa 12/23/2013 14:13'!
+image: aForm at: aPoint sourceRect: sourceRect rule: rule 
+	"Draw the portion of the given Form defined by sourceRect at the given point using the given BitBlt combination rule."
+
+"ojo origin ver de donde viene y sacarlo como declarado para el método"
+	| origin |
+	origin := Point x: 0 y: 0.
+	port colorMap: (aForm colormapIfNeededFor: form); fillColor: nil.
+	port image: aForm at: aPoint + origin sourceRect: sourceRect rule: rule.
+	(form depth = 32 and: [aForm depth = 16])
+		ifTrue: [port image: nil at: aPoint + origin sourceRect: sourceRect rule: 40 "fixAlpha:with:"].
+! !
+
+!FormCanvas methodsFor: '*Plot-Morph' stamp: 'gsa 12/23/2013 14:01'!
+line: pt1 to: pt2 color: c
+
+	self line: pt1 to: pt2 width: 1 color: c.
+! !
 
 !Morph methodsFor: '*Plot-Morph' stamp: 'gsa 12/22/2013 13:00'!
 borderWidth
@@ -588,14 +627,14 @@ references: aMorphOrNil
 
 	references _ aMorphOrNil! !
 
-!PlotMorph methodsFor: 'drawing' stamp: 'dgd 7/14/2002 16:24'!
+!PlotMorph methodsFor: 'drawing' stamp: 'gsa 12/23/2013 13:58'!
 scalePoints
 	| |
 	scaledPoints _ nil.
 	series
 		do: [:serie | serie
 				scaleTo: self drawBounds
-				height: self height - (self borderWidth * 2)
+				height: self morphHeight - (self borderWidth * 2)
 				maxPoint: self maxPoint
 				minPoint: self minPoint]! !
 
@@ -892,7 +931,7 @@ plotSeries: aPointOrderedCollection
 	plotMorph openInWorld.
 	^ plotMorph! !
 
-!PlotMorph class methodsFor: 'testing' stamp: 'jcg 8/29/2003 23:10'!
+!PlotMorph class methodsFor: 'testing' stamp: 'gsa 12/23/2013 14:17'!
 test
 	" 
 	PlotMorph test  
@@ -906,8 +945,8 @@ test
 				b: 0.317);
 		 extent: 320 @ 320;
 		 borderWidth: 2;
-		 useRoundedCorners;
-		 setBorderStyle: #raised;
+		" useRoundedCorners;"
+		" setBorderStyle: #raised;"
 		 title: 'Some test functions'.
 	pm series: #sin color: Color red;
 		 series: #cos color: Color blue;
