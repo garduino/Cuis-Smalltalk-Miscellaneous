@@ -1,6 +1,6 @@
-'From Cuis 4.2 of 25 July 2013 [latest update: #1898] on 23 December 2013 at 2:28:44.317074 pm'!
+'From Cuis 4.2 of 25 July 2013 [latest update: #1898] on 27 December 2013 at 2:25:22.810761 pm'!
 'Description Please enter a description for this package'!
-!provides: 'Plot-Morph' 1 5!
+!provides: 'Plot-Morph' 1 8!
 !classDefinition: #AxesMorph category: #'Plot-Morph'!
 BorderedRectMorph subclass: #AxesMorph
 	instanceVariableNames: 'form limitMaxX limitMinX limitMaxY limitMinY title xmax xmid xmin ymax ymid ymin xAxisFormatter yAxisFormatter margin grid drawCotas'
@@ -285,12 +285,13 @@ initialize
 	"gsa"
 	self morphExtent: 1@1.! !
 
-!AxesMorph methodsFor: 'initialization' stamp: 'gsa 12/22/2013 11:47'!
+!AxesMorph methodsFor: 'initialization' stamp: 'gsa 12/27/2013 13:05'!
 initializeCotas
 	drawCotas := true.
 	""
 	"title := StringMorph contents: '' font: TextStyle defaultFont emphasis: 1."
-	title := StringMorph contents: ''.
+	
+	title := StringMorph contents: ''  font: StrikeFont default emphasis: 1.
 	xmax := StringMorph contents: ''.
 	xmid := StringMorph contents: ''.
 	xmin := StringMorph contents: ''.
@@ -401,7 +402,7 @@ title:aString
 
 	title contents: aString! !
 
-!AxesMorph methodsFor: 'drawing' stamp: 'gsa 12/22/2013 12:32'!
+!AxesMorph methodsFor: 'drawing' stamp: 'gsa 12/27/2013 11:24'!
 updateCotas
 	
 	| cotaColor |
@@ -430,18 +431,18 @@ updateCotas
 	ymin
 		contents: (yAxisFormatter value: self minPoint y).
 	""
-	title morphPosition: self topLeft + ((self morphWidth - title morphWidth / 2) rounded @ 0) + (0 @ "self borderWidth" self morphWidth).
+	title morphPosition: self topLeft + ((self morphWidth - title morphWidth / 2) rounded @ 0) + (0 @ self borderWidth).
 	""
-	xmax morphPosition: self topLeft + (self morphWidth - xmax morphWidth @ (self morphHeight - xmax morphHeight)) - (margin @ self morphWidth).
-	xmid morphPosition: self topLeft + ((self morphWidth - xmid morphWidth / 2) rounded @ (self morphHeight - xmid morphHeight)) - (0 @ self morphWidth).
-	xmin morphPosition: self topLeft + (0 @ (self morphHeight - xmin morphHeight)) + (margin @ 0) - (0 @ self morphWidth).
+	xmax morphPosition: self topLeft + (self morphWidth - xmax morphWidth @ (self morphHeight - xmax morphHeight)) - (margin @ self borderWidth).
+	xmid morphPosition: self topLeft + ((self morphWidth - xmid morphWidth / 2) rounded @ (self morphHeight - xmid morphHeight)) - (0 @ self borderWidth).
+	xmin morphPosition: self topLeft + (0 @ (self morphHeight - xmin morphHeight)) + (margin @ 0) - (0 @ self borderWidth).
 	""
 	ymax morphPosition: self topLeft + ((0 - ymax morphWidth max: 0)
 				@ 0) + (self morphWidth @ margin).
 	ymid morphPosition: self topLeft + ((15 - ymid morphWidth max: 0)
-				@ (self morphHeight - ymid morphHeight / 2) rounded) + (self morphWidth @ 0).
+				@ (self morphHeight - ymid morphHeight / 2) rounded) + (self borderWidth @ 0).
 	ymin morphPosition: self topLeft + ((0 - ymin morphWidth max: 0)
-				@ (self morphHeight - ymin morphHeight)) - (0 @ margin) + (self morphWidth @ 0)! !
+				@ (self morphHeight - ymin morphHeight)) - (0 @ margin) + (self borderWidth @ 0)! !
 
 !AxesMorph methodsFor: 'drawing' stamp: 'jcg 8/30/2003 12:40'!
 updateForm
@@ -891,15 +892,15 @@ yAxeFormatter: aFormatterBlock
 	self deprecatedExplanation: 'use #yxAxisFormatter: instead'.
 	self yAxisFormatter: aFormatterBlock! !
 
-!PlotMorph class methodsFor: 'instance creation' stamp: 'dgd 10/11/2003 21:16'!
+!PlotMorph class methodsFor: 'instance creation' stamp: 'gsa 12/27/2013 14:05'!
 plotPoints: aPointOrderedCollection 
 	| plotMorph |
 	plotMorph := PlotMorph new.
 	plotMorph color: Color black twiceLighter twiceLighter;
 		 title: 'Colors';
-		 extent: 700 @ 300;
-		 useRoundedCorners;
-		 borderRaised.
+		 extent: 700 @ 300.
+		" useRoundedCorners;
+		 borderRaised."
 	plotMorph series: #series color: Color white;
 		 series: #series drawLine: false.
 	aPointOrderedCollection
@@ -914,15 +915,15 @@ plotSerie: aPointOrderedCollection
 	self deprecatedExplanation: 'use #plotSeries: instead'.
 	^ self plotSeries: aPointOrderedCollection! !
 
-!PlotMorph class methodsFor: 'instance creation' stamp: 'dgd 10/11/2003 21:16'!
+!PlotMorph class methodsFor: 'instance creation' stamp: 'gsa 12/27/2013 14:05'!
 plotSeries: aPointOrderedCollection 
 	| plotMorph |
 	plotMorph := PlotMorph new.
 	plotMorph color: Color gray lighter;
 		 title: 'Colors';
-		 extent: 700 @ 300;
-		 useRoundedCorners;
-		 borderRaised.
+		 extent: 700 @ 300.
+		 "useRoundedCorners;
+		 borderRaised."
 	plotMorph series: #series color: Color red;
 		 series: #series drawLine: false.
 	aPointOrderedCollection
@@ -1041,18 +1042,22 @@ test4
 					@ (function value: x)].
 	pm openInWorld! !
 
-!PlotMorph class methodsFor: 'testing' stamp: 'jcg 8/29/2003 15:15'!
+!PlotMorph class methodsFor: 'testing' stamp: 'gsa 12/27/2013 14:22'!
 testWithReferences
 	" 
 	PlotMorph testWithReferences.
 	"
 	| pm ref |
-	ref := AlignmentMorph newColumn.
-	ref color: Color magenta twiceDarker twiceDarker;
+"	ref := AlignmentMorph newColumn."
+"	ref color: Color magenta twiceDarker twiceDarker;
 		 hResizing: #shrinkWrap;
 		 vResizing: #shrinkWrap;
 		 wrapCentering: #center;
-		 cellPositioning: #leftCenter.
+		 cellPositioning: #leftCenter."
+	ref := LayoutMorph newColumn.
+	ref color: Color magenta twiceDarker twiceDarker.
+		
+	
 	""
 	pm := PlotMorph new.
 	pm references: ref.
@@ -1262,7 +1267,7 @@ drawOn: aCanvas
 drawPoints: aBoolean 
 	drawPoints _ aBoolean! !
 
-!PlotSeries methodsFor: 'drawing' stamp: 'dgd 7/20/2002 12:57'!
+!PlotSeries methodsFor: 'drawing' stamp: 'gsa 12/27/2013 14:12'!
 drawPointsOn: aCanvas 
 	| pointColor minus plus |
 	pointColor _ self pointColor.
@@ -1273,8 +1278,11 @@ drawPointsOn: aCanvas
 			| scaledPoint | 
 			scaledPoint _ point scaledPoint.
 			aCanvas
-				fillOval: (scaledPoint - minus rect: scaledPoint + plus)
-				color: pointColor]! !
+				fillRectangle: (scaledPoint - minus rect: scaledPoint + plus)
+				color: pointColor]
+				"gsa"
+				"fillOval: (scaledPoint - minus rect: scaledPoint + plus)
+				color: pointColor]"! !
 
 !PlotSeries methodsFor: 'drawing' stamp: 'dgd 10/15/2001 18:11'!
 drawSteppedAreaOn: aCanvas 
