@@ -1,6 +1,6 @@
-'From Cuis 4.2 of 25 July 2013 [latest update: #1898] on 27 December 2013 at 2:25:22.810761 pm'!
+'From Cuis 4.2 of 25 July 2013 [latest update: #1898] on 28 December 2013 at 7:29:58.494043 pm'!
 'Description Please enter a description for this package'!
-!provides: 'Plot-Morph' 1 8!
+!provides: 'Plot-Morph' 1 10!
 !classDefinition: #AxesMorph category: #'Plot-Morph'!
 BorderedRectMorph subclass: #AxesMorph
 	instanceVariableNames: 'form limitMaxX limitMinX limitMaxY limitMinY title xmax xmid xmin ymax ymid ymin xAxisFormatter yAxisFormatter margin grid drawCotas'
@@ -496,22 +496,22 @@ clear
 	series do:[:each | each clear].
 	self seriesChanged! !
 
-!PlotMorph methodsFor: 'deprecated' stamp: 'jcg 8/29/2003 22:46'!
+!PlotMorph methodsFor: 'deprecated' stamp: 'gsa 12/28/2013 19:23'!
 drawAxis: aBoolean 
 	
-	self deprecatedExplanation: 'use #shouldDrawAxis: instead'.
+	" use #shouldDrawAxis: instead this method ".
 	self shouldDrawAxis: aBoolean! !
 
-!PlotMorph methodsFor: 'deprecated' stamp: 'jcg 8/29/2003 22:46'!
+!PlotMorph methodsFor: 'deprecated' stamp: 'gsa 12/28/2013 19:23'!
 drawCotas: aBoolean 
 	
-	self deprecatedExplanation: 'use #shouldDrawCotas: instead'.
+	" use #shouldDrawCotas: instead this method ".
 	self shouldDrawCotas: aBoolean! !
 
-!PlotMorph methodsFor: 'deprecated' stamp: 'jcg 8/29/2003 22:46'!
+!PlotMorph methodsFor: 'deprecated' stamp: 'gsa 12/28/2013 19:24'!
 drawGrid: aBoolean 
 	
-	self deprecatedExplanation: 'use #shouldDrawGrid: instead'.
+	" use #shouldDrawGrid: instead this method ".
 	self shouldDrawGrid: aBoolean! !
 
 !PlotMorph methodsFor: 'private' stamp: 'DGD 6/28/2001 14:50'!
@@ -653,64 +653,64 @@ scaledPoints
 							allPoints add: point]].
 			scaledPoints]! !
 
-!PlotMorph methodsFor: 'deprecated' stamp: 'jcg 8/29/2003 16:38'!
+!PlotMorph methodsFor: 'deprecated' stamp: 'gsa 12/28/2013 19:24'!
 serie: aSeriesOrSymbol
 
-	self deprecatedExplanation: 'use #series: instead'.
+	" use #series: instead this method ".
 	^ self series: aSeriesOrSymbol! !
 
-!PlotMorph methodsFor: 'deprecated' stamp: 'jcg 8/29/2003 16:39'!
+!PlotMorph methodsFor: 'deprecated' stamp: 'gsa 12/28/2013 19:25'!
 serie: aSymbol addPoint: aPoint 
 
-	self deprecatedExplanation: 'use #series:addPoint: instead'.
+	" use #series:addPoint: instead this method ".
 	^ self series: aSymbol addPoint: aPoint! !
 
-!PlotMorph methodsFor: 'deprecated' stamp: 'jcg 8/29/2003 16:40'!
+!PlotMorph methodsFor: 'deprecated' stamp: 'gsa 12/28/2013 19:25'!
 serie: aSymbol addPoint: aPoint extra: anObject
 
-	self deprecatedExplanation: 'use #series:addPoint:extra: instead'.
+	" use #series:addPoint:extra: instead this method ".
 	^ self series: aSymbol addPoint: aPoint extra: anObject! !
 
-!PlotMorph methodsFor: 'deprecated' stamp: 'jcg 8/29/2003 16:41'!
+!PlotMorph methodsFor: 'deprecated' stamp: 'gsa 12/28/2013 19:26'!
 serie: aSymbol color: aColor
 
-	self deprecatedExplanation: 'use #series:color: instead'.
+	" use #series:color: instead this method ".
 	^ self series: aSymbol color: aColor! !
 
-!PlotMorph methodsFor: 'deprecated' stamp: 'jcg 8/29/2003 16:41'!
+!PlotMorph methodsFor: 'deprecated' stamp: 'gsa 12/28/2013 19:26'!
 serie: aSymbol description: aString
 
-	self deprecatedExplanation: 'use #series:description: instead'.
+	" use #series:description: instead this method ".
 	^ self series: aSymbol description: aString! !
 
-!PlotMorph methodsFor: 'deprecated' stamp: 'jcg 8/29/2003 16:41'!
+!PlotMorph methodsFor: 'deprecated' stamp: 'gsa 12/28/2013 19:26'!
 serie: aSymbol drawArea: aBoolean
 
-	self deprecatedExplanation: 'use #series:drawArea: instead'.
+	" use #series:drawArea: instead this method ".
 	^ self series: aSymbol drawArea: aBoolean! !
 
-!PlotMorph methodsFor: 'deprecated' stamp: 'jcg 8/29/2003 16:41'!
+!PlotMorph methodsFor: 'deprecated' stamp: 'gsa 12/28/2013 19:27'!
 serie: aSymbol drawLine: aBoolean
 
-	self deprecatedExplanation: 'use #series:drawLine: instead'.
+	" use #series:drawLine: instead this method ".
 	^ self series: aSymbol drawLine: aBoolean! !
 
-!PlotMorph methodsFor: 'deprecated' stamp: 'jcg 8/29/2003 16:42'!
+!PlotMorph methodsFor: 'deprecated' stamp: 'gsa 12/28/2013 19:27'!
 serie: aSymbol drawPoints: aBoolean
 
-	self deprecatedExplanation: 'use #series:drawPoints: instead'.
+	" use #series:drawPoints: instead this method ".
 	^ self series: aSymbol drawPoints: aBoolean! !
 
-!PlotMorph methodsFor: 'deprecated' stamp: 'jcg 8/29/2003 21:00'!
+!PlotMorph methodsFor: 'deprecated' stamp: 'gsa 12/28/2013 19:27'!
 serie: aSymbol type: lineTypeSymbol 
 
-	self deprecatedExplanation: 'use #series:type: instead'.
+	" use #series:type: instead this method ".
 	^ self series: aSymbol type: lineTypeSymbol! !
 
-!PlotMorph methodsFor: 'deprecated' stamp: 'jcg 8/29/2003 21:00'!
+!PlotMorph methodsFor: 'deprecated' stamp: 'gsa 12/28/2013 19:28'!
 serie: aSymbol width: anInteger 
 
-	self deprecatedExplanation: 'use #series:width: instead'.
+	" use #series:width: instead this method ".
 	^ self series: aSymbol width: anInteger! !
 
 !PlotMorph methodsFor: 'accessing' stamp: 'gs 11/30/2001 02:51'!
@@ -880,16 +880,16 @@ updateReferences
 			references addMorphBack: ref.
 			serie]! !
 
-!PlotMorph methodsFor: 'deprecated' stamp: 'jcg 8/29/2003 23:08'!
+!PlotMorph methodsFor: 'deprecated' stamp: 'gsa 12/28/2013 19:28'!
 xAxeFormatter: aFormatterBlock 
 
-	self deprecatedExplanation: 'use #xAxisFormatter: instead'.
+	" use #xAxisFormatter: instead this method ".
 	self xAxisFormatter: aFormatterBlock! !
 
-!PlotMorph methodsFor: 'deprecated' stamp: 'jcg 8/29/2003 23:08'!
+!PlotMorph methodsFor: 'deprecated' stamp: 'gsa 12/28/2013 19:29'!
 yAxeFormatter: aFormatterBlock 
 
-	self deprecatedExplanation: 'use #yxAxisFormatter: instead'.
+	" use #yxAxisFormatter: instead this method ".
 	self yAxisFormatter: aFormatterBlock! !
 
 !PlotMorph class methodsFor: 'instance creation' stamp: 'gsa 12/27/2013 14:05'!
