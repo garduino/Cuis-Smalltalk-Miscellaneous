@@ -1,8 +1,8 @@
-'From Cuis 4.2 of 25 July 2013 [latest update: #1898] on 28 December 2013 at 7:29:58.494043 pm'!
+'From Cuis 4.2 of 25 July 2013 [latest update: #1910] on 28 December 2013 at 8:43:31.015204 pm'!
 'Description Please enter a description for this package'!
-!provides: 'Plot-Morph' 1 10!
+!provides: 'Plot-Morph' 1 11!
 !classDefinition: #AxesMorph category: #'Plot-Morph'!
-BorderedRectMorph subclass: #AxesMorph
+PluggableMorph subclass: #AxesMorph
 	instanceVariableNames: 'form limitMaxX limitMinX limitMaxY limitMinY title xmax xmid xmin ymax ymid ymin xAxisFormatter yAxisFormatter margin grid drawCotas'
 	classVariableNames: ''
 	poolDictionaries: ''
@@ -222,13 +222,15 @@ drawBounds
 	^ (0 @ 0 rect: self morphWidth @ self morphHeight - (self borderWidth * 2))
 		insetBy: margin! !
 
-!AxesMorph methodsFor: 'drawing' stamp: 'jcg 8/30/2003 12:42'!
+!AxesMorph methodsFor: 'drawing' stamp: 'gsa 12/28/2013 20:28'!
 drawOn: aCanvas 
 	super drawOn: aCanvas.
 	aCanvas
 		image: self form
 		at: self topLeft + self borderWidth
-		rule: Form blend! !
+		rule: Form blend
+	
+	! !
 
 !AxesMorph methodsFor: 'geometry' stamp: 'gsa 12/22/2013 12:31'!
 extent: aPoint 
@@ -843,7 +845,7 @@ textForBalloon: aCollection
 		separatedBy: [stream nextPut: Character cr].
 	^ stream contents! !
 
-!PlotMorph methodsFor: 'drawing' stamp: 'jcg 8/30/2003 16:06'!
+!PlotMorph methodsFor: 'drawing' stamp: 'gsa 12/28/2013 20:18'!
 updateForm
 	"Override superclass implementation to do drawing of data."
 	| canvas |
@@ -852,6 +854,10 @@ updateForm
 	self updateCotas.
 	self scalePoints.
 	canvas _ form getCanvas.
+	
+	" canvas rounded. "
+		
+	
 	grid drawOn: canvas.
 	(series values
 		asSortedCollection: [:x :y | x name <= y name])
