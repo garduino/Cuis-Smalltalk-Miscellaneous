@@ -1,6 +1,6 @@
-'From Cuis 4.2 of 25 July 2013 [latest update: #1910] on 28 December 2013 at 8:43:31.015204 pm'!
+'From Cuis 4.2 of 25 July 2013 [latest update: #1940] on 16 January 2014 at 8:09:17.384031 pm'!
 'Description Please enter a description for this package'!
-!provides: 'Plot-Morph' 1 11!
+!provides: 'Plot-Morph' 1 12!
 !classDefinition: #AxesMorph category: #'Plot-Morph'!
 PluggableMorph subclass: #AxesMorph
 	instanceVariableNames: 'form limitMaxX limitMinX limitMaxY limitMinY title xmax xmid xmin ymax ymid ymin xAxisFormatter yAxisFormatter margin grid drawCotas'
@@ -133,6 +133,26 @@ line: pt1 to: pt2 color: c
 
 	self line: pt1 to: pt2 width: 1 color: c.
 ! !
+
+!Integer methodsFor: '*Plot-Morph' stamp: 'gsa 1/16/2014 20:06'!
+asStringWithCommas
+	"123456789 asStringWithCommas"
+	"-123456789 asStringWithCommas"
+	^ self asStringWithCommasSigned: false! !
+
+!Integer methodsFor: '*Plot-Morph' stamp: 'gsa 1/16/2014 20:07'!
+asStringWithCommasSigned: aBoolean
+	"123456789 asStringWithCommasSigned: true"
+	"-123456789 asStringWithCommasSigned: false"
+	| digits |
+	digits := self abs printString.
+	^ String streamContents:
+		[:strm | 
+		self sign = -1 ifTrue: [strm nextPut: $-] ifFalse: [aBoolean ifTrue: [strm nextPut: $+]].
+		1 to: digits size do: 
+			[:i | strm nextPut: (digits at: i).
+			(i < digits size and: [(i - digits size) \\ 3 = 0])
+				ifTrue: [strm nextPut: $,]]]! !
 
 !Morph methodsFor: '*Plot-Morph' stamp: 'gsa 12/22/2013 13:00'!
 borderWidth
