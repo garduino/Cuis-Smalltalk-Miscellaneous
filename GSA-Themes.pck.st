@@ -1,7 +1,7 @@
-'From Cuis 4.2 of 25 July 2013 [latest update: #2021] on 18 June 2014 at 2:35:11.77827 pm'!
+'From Cuis 4.2 of 25 July 2013 [latest update: #2280] on 1 May 2015 at 11:33:00.573845 am'!
 'Description Please enter a description for this package'!
-!provides: 'GSA-Themes' 1 0!
-!requires: 'Theme-Themes' 1 1!
+!provides: 'GSA-Themes' 1 1!
+!requires: 'Theme-Themes' 1 1 nil!
 !classDefinition: #SkypeTheme category: #'GSA-Themes'!
 Theme subclass: #SkypeTheme
 	instanceVariableNames: ''
@@ -19,6 +19,11 @@ A nice deep blue theme.!
 !SkypeTheme methodsFor: 'colors' stamp: 'gsa 6/18/2014 09:46'!
 buttonLabel
 	^ Color hue: 0 chroma: 0 luminance: 0.13! !
+
+!SkypeTheme methodsFor: 'tool colors' stamp: 'gsa 5/1/2015 11:30'!
+debugger
+	^ Color lightYellow
+	! !
 
 !SkypeTheme methodsFor: 'tool colors' stamp: 'gsa 6/18/2014 13:44'!
 defaultWindowColor
