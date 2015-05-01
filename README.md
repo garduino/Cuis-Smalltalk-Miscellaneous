@@ -3,6 +3,8 @@ Cuis-Miscelaneous
 
 Different code experiments and ports.
 
+GSA-Themes: It's a exercise to understand how to configure Cuis themes. SkypeTheme is a theme with a mix of
+blue, remembering the well know chat program.
 
 Cuis-SerialPort: It's the SerialPort class taken from Squeak 4.4
 
