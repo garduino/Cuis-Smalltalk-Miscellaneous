@@ -1,6 +1,19 @@
-'From Cuis 4.2 of 25 July 2013 [latest update: #1940] on 16 January 2014 at 8:09:17.384031 pm'!
+'From Cuis 5.0 of 7 November 2016 [latest update: #3267] on 7 March 2018 at 9:22:10 pm'!
 'Description Please enter a description for this package'!
-!provides: 'Plot-Morph' 1 12!
+!provides: 'Plot-Morph' 1 13!
+SystemOrganization addCategory: #'Plot-Morph'!
+
+
+!classDefinition: #PlotPoint category: #'Plot-Morph'!
+Point subclass: #PlotPoint
+	instanceVariableNames: 'series scaledPoint extra'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Plot-Morph'!
+!classDefinition: 'PlotPoint class' category: #'Plot-Morph'!
+PlotPoint class
+	instanceVariableNames: ''!
+
 !classDefinition: #AxesMorph category: #'Plot-Morph'!
 PluggableMorph subclass: #AxesMorph
 	instanceVariableNames: 'form limitMaxX limitMinX limitMaxY limitMinY title xmax xmid xmin ymax ymid ymin xAxisFormatter yAxisFormatter margin grid drawCotas'
@@ -41,16 +54,9 @@ Object subclass: #PlotSeries
 PlotSeries class
 	instanceVariableNames: ''!
 
-!classDefinition: #PlotPoint category: #'Plot-Morph'!
-Point subclass: #PlotPoint
-	instanceVariableNames: 'series scaledPoint extra'
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'Plot-Morph'!
-!classDefinition: 'PlotPoint class' category: #'Plot-Morph'!
-PlotPoint class
-	instanceVariableNames: ''!
 
+!PlotPoint commentStamp: '<historical>' prior: 0!
+PlotPoint is a point that have more data used to draw in a PlotMorph!
 
 !AxesMorph commentStamp: '<historical>' prior: 0!
 I am responsible for drawing a pair of axes, a grid, and various labels.  I am not responsible for the display of any data, or for handling user input in any special way.!
@@ -92,95 +98,84 @@ I'm the grid of a PlotMorph!
 !PlotSeries commentStamp: '<historical>' prior: 0!
 I'm a serie of a PlotMorph!
 
-!PlotPoint commentStamp: '<historical>' prior: 0!
-PlotPoint is a point that have more data used to draw in a PlotMorph!
+!PlotPoint methodsFor: 'initialization' stamp: 'DGD 5/28/2001 01:41'!
+initialize
+scaledPoint _ self! !
 
-!FormCanvas methodsFor: '*Plot-Morph' stamp: 'gsa 12/23/2013 14:21'!
-drawPolygon: vertices color: aColor borderWidth: bw borderColor: bc
-	"Generalize for the BalloonCanvas"
-	^self drawPolygon: vertices fillStyle: aColor borderWidth: bw borderColor: bc! !
+!PlotPoint methodsFor: 'initialization' stamp: 'dgd 10/11/2003 21:16'!
+initializeAt: aPoint series: aPlotSeries 
+	self setX: aPoint x setY: aPoint y.
+	series := aPlotSeries! !
 
-!FormCanvas methodsFor: '*Plot-Morph' stamp: 'gsa 12/23/2013 14:21'!
-drawPolygon: vertices fillStyle: aFillStyle borderWidth: bw borderColor: bc
-	"Fill the given polygon.
-	Note: The default implementation does not recognize any enhanced fill styles"
-	self drawPolygon: vertices color: aFillStyle borderWidth: bw borderColor: bc! !
+!PlotPoint methodsFor: 'initialization' stamp: 'dgd 10/11/2003 21:16'!
+initializeAt: aPoint series: aPlotSeries extra: anObject 
+	self setX: aPoint x setY: aPoint y.
+	series := aPlotSeries.
+	extra := anObject! !
 
-!FormCanvas methodsFor: '*Plot-Morph' stamp: 'gsa 12/23/2013 14:03'!
-image: aForm at: aPoint rule: combinationRule
-	"Note: This protocol is deprecated. Use one of the explicit image drawing messages (#paintImage, #drawImage) instead."
-	self image: aForm
-		at: aPoint
-		sourceRect: aForm boundingBox
-		rule: combinationRule.
-! !
+!PlotPoint methodsFor: 'accessing' stamp: 'DGD 5/27/2001 23:29'!
+extra
+	^extra! !
 
-!FormCanvas methodsFor: '*Plot-Morph' stamp: 'gsa 12/23/2013 14:13'!
-image: aForm at: aPoint sourceRect: sourceRect rule: rule 
-	"Draw the portion of the given Form defined by sourceRect at the given point using the given BitBlt combination rule."
+!PlotPoint methodsFor: 'accessing' stamp: 'dgd 9/19/2001 22:58'!
+scaledPoint
+	^ scaledPoint ifNil:[self]! !
 
-"ojo origin ver de donde viene y sacarlo como declarado para el método"
-	| origin |
-	origin := Point x: 0 y: 0.
-	port colorMap: (aForm colormapIfNeededFor: form); fillColor: nil.
-	port image: aForm at: aPoint + origin sourceRect: sourceRect rule: rule.
-	(form depth = 32 and: [aForm depth = 16])
-		ifTrue: [port image: nil at: aPoint + origin sourceRect: sourceRect rule: 40 "fixAlpha:with:"].
-! !
+!PlotPoint methodsFor: 'accessing' stamp: 'DGD 5/27/2001 18:23'!
+scaledPoint: anObject
+	scaledPoint _ anObject! !
 
-!FormCanvas methodsFor: '*Plot-Morph' stamp: 'gsa 12/23/2013 14:01'!
-line: pt1 to: pt2 color: c
+!PlotPoint methodsFor: 'accessing' stamp: 'dgd 10/11/2003 21:16'!
+series
+	^ series! !
 
-	self line: pt1 to: pt2 width: 1 color: c.
-! !
+!PlotPoint methodsFor: 'comparing' stamp: 'dgd 10/11/2003 21:16'!
+= anObject 
+	^ super = anObject
+		and: [series = anObject series
+				and: [extra = anObject extra]]! !
 
-!Integer methodsFor: '*Plot-Morph' stamp: 'gsa 1/16/2014 20:06'!
-asStringWithCommas
-	"123456789 asStringWithCommas"
-	"-123456789 asStringWithCommas"
-	^ self asStringWithCommasSigned: false! !
+!PlotPoint methodsFor: 'comparing' stamp: 'dgd 10/11/2003 21:15'!
+hash
+	^ super hash
+		bitXor: (series hash bitXor: extra hash)! !
 
-!Integer methodsFor: '*Plot-Morph' stamp: 'gsa 1/16/2014 20:07'!
-asStringWithCommasSigned: aBoolean
-	"123456789 asStringWithCommasSigned: true"
-	"-123456789 asStringWithCommasSigned: false"
-	| digits |
-	digits := self abs printString.
-	^ String streamContents:
-		[:strm | 
-		self sign = -1 ifTrue: [strm nextPut: $-] ifFalse: [aBoolean ifTrue: [strm nextPut: $+]].
-		1 to: digits size do: 
-			[:i | strm nextPut: (digits at: i).
-			(i < digits size and: [(i - digits size) \\ 3 = 0])
-				ifTrue: [strm nextPut: $,]]]! !
+!PlotPoint methodsFor: 'printing' stamp: 'dgd 10/11/2003 21:16'!
+printOn: aStream 
+	super printOn: aStream.
+	aStream nextPutAll: ' series:(';
+		 print: series;
+		 nextPutAll: ') scaled:';
+		 print: scaledPoint.
+	extra isNil
+		ifFalse: [aStream nextPutAll: ' extra:';
+				 print: extra]! !
 
-!Morph methodsFor: '*Plot-Morph' stamp: 'gsa 12/22/2013 13:00'!
-borderWidth
-	^self morphWidth! !
+!PlotPoint class methodsFor: 'instance creation' stamp: 'dgd 10/11/2003 21:15'!
+at: aPoint serie: aPlotSerie 
+	^ self new initializeAt: aPoint series: aPlotSerie! !
 
-!Morph methodsFor: '*Plot-Morph' stamp: 'gsa 12/22/2013 19:50'!
-bounds
+!PlotPoint class methodsFor: 'instance creation' stamp: 'DGD 6/13/2001 19:26'!
+at: aPoint serie: aPlotSerie extra: anObject 
+	^ self new
+		initializeAt: aPoint
+		serie: aPlotSerie
+		extra: anObject! !
 
-" ojo, este es el que da errores al evaluar los test2, test4.
-Si devuelvo location da el error de falta de insetBy: en Matrix2x3, si devuelvo location position da el mismo error pero para Point,
-ver en Squeak que tipo de objeto devuelve bounds"
+!PlotPoint class methodsFor: 'instance creation' stamp: 'dgd 10/11/2003 21:14'!
+at: aPoint series: aPlotSeries
+	^ self new initializeAt: aPoint series: aPlotSeries! !
 
-	"^ location position"
-	^ self morphBoundsInWorld! !
+!PlotPoint class methodsFor: 'instance creation' stamp: 'dgd 10/11/2003 21:14'!
+at: aPoint series: aPlotSeries extra: anObject 
+	^ self new
+		initializeAt: aPoint
+		series: aPlotSeries
+		extra: anObject! !
 
-!Morph methodsFor: '*Plot-Morph' stamp: 'gsa 12/22/2013 19:51'!
-topLeft
-
-	" original "
-	"^ bounds topLeft"
-	"^ location position"
-	^ 0@0! !
-
-!Point methodsFor: '*Plot-Morph' stamp: 'gsa 12/22/2013 19:55'!
-scaleFrom: rect1 to: rect2
-	"Produce a point stretched according to the stretch from rect1 to rect2"
-	^ rect2 topLeft + (((x-rect1 left) * rect2 width // rect1 width)
-					@ ((y-rect1 top) * rect2 height // rect1 height))! !
+!PlotPoint class methodsFor: 'instance creation' stamp: 'DGD 5/28/2001 01:41'!
+new
+^super new initialize! !
 
 !AxesMorph methodsFor: 'accessing' stamp: 'jcg 8/30/2003 13:04'!
 baseColor
@@ -195,83 +190,11 @@ baseColor
 			current := current owner].
 	^ baseColor! !
 
-!AxesMorph methodsFor: 'change reporting' stamp: 'jcg 8/30/2003 11:54'!
-changed
-
-	super changed.
-	form _ nil.! !
-
 !AxesMorph methodsFor: 'accessing' stamp: 'jcg 8/30/2003 11:50'!
 color: aColor 
 	
 	super color: aColor.
 	self updateCotas! !
-
-!AxesMorph methodsFor: 'drawing' stamp: 'jcg 8/30/2003 13:03'!
-cotaColor
-	| baseColor lighter darker |
-	baseColor := self baseColor asNontranslucentColor.
-	baseColor = Color white
-		ifTrue: [^ Color black].
-	""
-	lighter := baseColor muchLighter.
-	darker := baseColor muchDarker.
-	""
-	^ (lighter diff: baseColor) > (darker diff: baseColor)
-		ifTrue: [lighter]
-		ifFalse: [darker]! !
-
-!AxesMorph methodsFor: 'utility' stamp: 'jcg 8/31/2003 12:36'!
-dataPointToGridPoint: aPoint
-	"Compute the pixel coordinates wrt the grid origin of the given data point."
-	| drawBounds |
-
-	drawBounds _ self drawBounds.
-	^ (aPoint - self minPoint) * (drawBounds width @ drawBounds height negated).
-! !
-
-!AxesMorph methodsFor: 'utility' stamp: 'jcg 8/31/2003 12:38'!
-dataPointToWorldPoint: aPoint
-	"Compute the pixel coordinates wrt the World origin of the given data point."
-
-	^ (self dataPointToGridPoint: aPoint) + self gridOrigin! !
-
-!AxesMorph methodsFor: 'geometry' stamp: 'gsa 12/22/2013 19:45'!
-drawBounds
-	"answer the rectangle inside the morph where the plot is drawn"
-	^ (0 @ 0 rect: self morphWidth @ self morphHeight - (self borderWidth * 2))
-		insetBy: margin! !
-
-!AxesMorph methodsFor: 'drawing' stamp: 'gsa 12/28/2013 20:28'!
-drawOn: aCanvas 
-	super drawOn: aCanvas.
-	aCanvas
-		image: self form
-		at: self topLeft + self borderWidth
-		rule: Form blend
-	
-	! !
-
-!AxesMorph methodsFor: 'geometry' stamp: 'gsa 12/22/2013 12:31'!
-extent: aPoint 
-	super
-		morphExtent: (aPoint max: self minExtent)! !
-
-!AxesMorph methodsFor: 'naming' stamp: 'jcg 8/30/2003 16:01'!
-externalName
-	^ super externalName, (title contents isEmpty ifTrue:[''] ifFalse:[' - ', title contents])! !
-
-!AxesMorph methodsFor: 'drawing' stamp: 'jcg 8/30/2003 12:38'!
-form
-
-	form ifNil: [
-		Cursor wait showWhile: [
-			form _ Form 
-						extent: (self bounds insetBy: self borderWidth) extent
-						depth: Display depth.
-			form fillColor: self color. 
-			self updateForm]].
-	^ form! !
 
 !AxesMorph methodsFor: 'accessing' stamp: 'jcg 8/31/2003 11:07'!
 gridOrigin
@@ -280,59 +203,6 @@ gridOrigin
 
 	inset _ self borderWidth + margin.
 	^ self bottomLeft + (inset @ inset negated)! !
-
-!AxesMorph methodsFor: 'utility' stamp: 'jcg 8/31/2003 12:32'!
-gridPointToDataPoint: aPoint
-	"Compute the coordinates of the data point corresponding to the given grid point (given in pixel coordinates wrt the grid origin)."
-	| drawBounds |
-
-	drawBounds _ self drawBounds.
-	^ (aPoint x @ aPoint y negated) / (drawBounds extent) + self minPoint
-! !
-
-!AxesMorph methodsFor: 'initialization' stamp: 'gsa 12/22/2013 11:56'!
-initialize
-
-	super initialize.
-
-	self color: Color gray.
-	grid := PlotMorphGrid on: self.
-
-	xAxisFormatter := [:x | x printString].
-	yAxisFormatter := [:y | y printString].
-	self initializeCotas.
-	margin := 15 max: (title morphHeight + 2).
-	form := nil.
-	"self extent: 1@1."
-	"gsa"
-	self morphExtent: 1@1.! !
-
-!AxesMorph methodsFor: 'initialization' stamp: 'gsa 12/27/2013 13:05'!
-initializeCotas
-	drawCotas := true.
-	""
-	"title := StringMorph contents: '' font: TextStyle defaultFont emphasis: 1."
-	
-	title := StringMorph contents: ''  font: StrikeFont default emphasis: 1.
-	xmax := StringMorph contents: ''.
-	xmid := StringMorph contents: ''.
-	xmin := StringMorph contents: ''.
-	ymax := StringMorph contents: ''.
-	ymid := StringMorph contents: ''.
-	ymin := StringMorph contents: ''.
-	""
-	self addMorph: title.
-	self addMorph: xmax.
-	self addMorph: xmid.
-	self addMorph: xmin.
-	self addMorph: ymax.
-	self addMorph: ymid.
-	self addMorph: ymin.
-	""
-	limitMinX _ 0.
-	limitMaxX _ 1.0.
-	limitMinY _ 0.
-	limitMaxY _ 1.0.! !
 
 !AxesMorph methodsFor: 'accessing' stamp: 'jcg 8/30/2003 11:49'!
 limitMaxX: aNumberOrNil
@@ -368,22 +238,6 @@ margin: anInteger
  
 	margin _ anInteger.
 	self changed! !
-
-!AxesMorph methodsFor: 'drawing' stamp: 'jcg 8/30/2003 12:32'!
-maxPoint
-	"Limit values must be non-nil"
-
-	^ limitMaxX @ limitMaxY! !
-
-!AxesMorph methodsFor: 'geometry' stamp: 'jcg 8/30/2003 15:58'!
-minExtent
-	^ 125 @ 125 + margin ! !
-
-!AxesMorph methodsFor: 'drawing' stamp: 'jcg 8/30/2003 12:32'!
-minPoint
-	"Limit values must be non-nil"
-
-	^ limitMinX @ limitMinY! !
 
 !AxesMorph methodsFor: 'accessing' stamp: 'jcg 8/30/2003 13:05'!
 referenceColor
@@ -423,6 +277,112 @@ shouldDrawGrid: aBoolean
 title:aString
 
 	title contents: aString! !
+
+!AxesMorph methodsFor: 'accessing' stamp: 'jcg 8/29/2003 23:09'!
+xAxisFormatter: aFormatterBlock 
+
+	xAxisFormatter _ aFormatterBlock.
+	self updateCotas! !
+
+!AxesMorph methodsFor: 'accessing' stamp: 'jcg 8/29/2003 23:09'!
+yAxisFormatter: aFormatterBlock 
+
+	yAxisFormatter _ aFormatterBlock.
+	self updateCotas! !
+
+!AxesMorph methodsFor: 'utility' stamp: 'jcg 8/31/2003 12:36'!
+dataPointToGridPoint: aPoint
+	"Compute the pixel coordinates wrt the grid origin of the given data point."
+	| drawBounds |
+
+	drawBounds _ self drawBounds.
+	^ (aPoint - self minPoint) * (drawBounds width @ drawBounds height negated).
+! !
+
+!AxesMorph methodsFor: 'utility' stamp: 'jcg 8/31/2003 12:38'!
+dataPointToWorldPoint: aPoint
+	"Compute the pixel coordinates wrt the World origin of the given data point."
+
+	^ (self dataPointToGridPoint: aPoint) + self gridOrigin! !
+
+!AxesMorph methodsFor: 'utility' stamp: 'jcg 8/31/2003 12:32'!
+gridPointToDataPoint: aPoint
+	"Compute the coordinates of the data point corresponding to the given grid point (given in pixel coordinates wrt the grid origin)."
+	| drawBounds |
+
+	drawBounds _ self drawBounds.
+	^ (aPoint x @ aPoint y negated) / (drawBounds extent) + self minPoint
+! !
+
+!AxesMorph methodsFor: 'utility' stamp: 'jcg 8/31/2003 12:35'!
+worldPointToDataPoint: aPoint
+	"Compute the pixel coordinates of the given data point wrt the World origin."
+
+	^ self gridPointToDataPoint: aPoint - self gridOrigin
+	! !
+
+!AxesMorph methodsFor: 'geometry' stamp: 'gsa 12/22/2013 19:45'!
+drawBounds
+	"answer the rectangle inside the morph where the plot is drawn"
+	^ (0 @ 0 rect: self morphWidth @ self morphHeight - (self borderWidth * 2))
+		insetBy: margin! !
+
+!AxesMorph methodsFor: 'geometry' stamp: 'gsa 12/22/2013 12:31'!
+extent: aPoint 
+	super
+		morphExtent: (aPoint max: self minExtent)! !
+
+!AxesMorph methodsFor: 'geometry' stamp: 'jcg 8/30/2003 15:58'!
+minExtent
+	^ 125 @ 125 + margin ! !
+
+!AxesMorph methodsFor: 'drawing' stamp: 'jcg 8/30/2003 13:03'!
+cotaColor
+	| baseColor lighter darker |
+	baseColor := self baseColor asNontranslucentColor.
+	baseColor = Color white
+		ifTrue: [^ Color black].
+	""
+	lighter := baseColor muchLighter.
+	darker := baseColor muchDarker.
+	""
+	^ (lighter diff: baseColor) > (darker diff: baseColor)
+		ifTrue: [lighter]
+		ifFalse: [darker]! !
+
+!AxesMorph methodsFor: 'drawing' stamp: 'gsa 12/28/2013 20:28'!
+drawOn: aCanvas 
+	super drawOn: aCanvas.
+	aCanvas
+		image: self form
+		at: self topLeft + self borderWidth
+		rule: Form blend
+	
+	! !
+
+!AxesMorph methodsFor: 'drawing' stamp: 'jcg 8/30/2003 12:38'!
+form
+
+	form ifNil: [
+		Cursor wait showWhile: [
+			form _ Form 
+						extent: (self bounds insetBy: self borderWidth) extent
+						depth: Display depth.
+			form fillColor: self color. 
+			self updateForm]].
+	^ form! !
+
+!AxesMorph methodsFor: 'drawing' stamp: 'jcg 8/30/2003 12:32'!
+maxPoint
+	"Limit values must be non-nil"
+
+	^ limitMaxX @ limitMaxY! !
+
+!AxesMorph methodsFor: 'drawing' stamp: 'jcg 8/30/2003 12:32'!
+minPoint
+	"Limit values must be non-nil"
+
+	^ limitMinX @ limitMinY! !
 
 !AxesMorph methodsFor: 'drawing' stamp: 'gsa 12/27/2013 11:24'!
 updateCotas
@@ -472,35 +432,63 @@ updateForm
 	self updateCotas.
 	grid drawOn: form getCanvas.! !
 
-!AxesMorph methodsFor: 'utility' stamp: 'jcg 8/31/2003 12:35'!
-worldPointToDataPoint: aPoint
-	"Compute the pixel coordinates of the given data point wrt the World origin."
+!AxesMorph methodsFor: 'initialization' stamp: 'gsa 12/22/2013 11:56'!
+initialize
 
-	^ self gridPointToDataPoint: aPoint - self gridOrigin
-	! !
+	super initialize.
 
-!AxesMorph methodsFor: 'accessing' stamp: 'jcg 8/29/2003 23:09'!
-xAxisFormatter: aFormatterBlock 
+	self color: Color gray.
+	grid := PlotMorphGrid on: self.
 
-	xAxisFormatter _ aFormatterBlock.
-	self updateCotas! !
+	xAxisFormatter := [:x | x printString].
+	yAxisFormatter := [:y | y printString].
+	self initializeCotas.
+	margin := 15 max: (title morphHeight + 2).
+	form := nil.
+	"self extent: 1@1."
+	"gsa"
+	self morphExtent: 1@1.! !
 
-!AxesMorph methodsFor: 'accessing' stamp: 'jcg 8/29/2003 23:09'!
-yAxisFormatter: aFormatterBlock 
+!AxesMorph methodsFor: 'initialization' stamp: 'gsa 12/27/2013 13:05'!
+initializeCotas
+	drawCotas := true.
+	""
+	"title := StringMorph contents: '' font: TextStyle defaultFont emphasis: 1."
+	
+	title := StringMorph contents: ''  font: StrikeFont default emphasis: 1.
+	xmax := StringMorph contents: ''.
+	xmid := StringMorph contents: ''.
+	xmin := StringMorph contents: ''.
+	ymax := StringMorph contents: ''.
+	ymid := StringMorph contents: ''.
+	ymin := StringMorph contents: ''.
+	""
+	self addMorph: title.
+	self addMorph: xmax.
+	self addMorph: xmid.
+	self addMorph: xmin.
+	self addMorph: ymax.
+	self addMorph: ymid.
+	self addMorph: ymin.
+	""
+	limitMinX _ 0.
+	limitMaxX _ 1.0.
+	limitMinY _ 0.
+	limitMaxY _ 1.0.! !
 
-	yAxisFormatter _ aFormatterBlock.
-	self updateCotas! !
+!AxesMorph methodsFor: 'naming' stamp: 'jcg 8/30/2003 16:01'!
+externalName
+	^ super externalName, (title contents isEmpty ifTrue:[''] ifFalse:[' - ', title contents])! !
+
+!AxesMorph methodsFor: 'change reporting' stamp: 'jcg 8/30/2003 11:54'!
+changed
+
+	super changed.
+	form _ nil.! !
 
 !PlotMorph methodsFor: 'accessing' stamp: 'jcg 8/30/2003 16:04'!
 balloonFormatter: anObject
 	balloonFormatter _ anObject! !
-
-!PlotMorph methodsFor: 'change reporting' stamp: 'jcg 8/30/2003 11:54'!
-changed
-	
-	cachedMaxPoint _ nil.
-	cachedMinPoint _ nil.
-	super changed! !
 
 !PlotMorph methodsFor: 'accessing' stamp: 'gs 12/2/2001 11:40'!
 cleanSeries
@@ -517,6 +505,20 @@ cleanSeries
 clear
 	series do:[:each | each clear].
 	self seriesChanged! !
+
+!PlotMorph methodsFor: 'accessing' stamp: 'dgd 10/18/2001 16:57'!
+processMouseDown: aBoolean 
+	processMouseDown _ aBoolean! !
+
+!PlotMorph methodsFor: 'accessing' stamp: 'jcg 8/29/2003 22:53'!
+references: aMorphOrNil
+	"Specifies a morph (if not nil) that is updated with the names of the plotted series, displayed in the same color as the actual plot."
+
+	references _ aMorphOrNil! !
+
+!PlotMorph methodsFor: 'accessing' stamp: 'gs 11/30/2001 02:51'!
+series
+	^series! !
 
 !PlotMorph methodsFor: 'deprecated' stamp: 'gsa 12/28/2013 19:23'!
 drawAxis: aBoolean 
@@ -535,145 +537,6 @@ drawGrid: aBoolean
 	
 	" use #shouldDrawGrid: instead this method ".
 	self shouldDrawGrid: aBoolean! !
-
-!PlotMorph methodsFor: 'private' stamp: 'DGD 6/28/2001 14:50'!
-exploreExtrasAt: nearPoint 
-	| extras |
-	extras _ (self scaledPoints at: nearPoint)
-				collect: [:each | each extra].
-	extras _ extras
-				select: [:each | each notNil].
-
-extras isEmpty ifFalse:[
-	extras explore]! !
-
-!PlotMorph methodsFor: 'private' stamp: 'DGD 6/14/2001 00:04'!
-findNearestPointTo: targetPoint 
-	| nearestPoint |
-	nearestPoint _ nil.
-	Cursor wait
-				showWhile: [""
-					self scaledPoints
-						keysDo: [:scaledPoint | ""
-							(nearestPoint isNil
-									or: [(targetPoint dist: scaledPoint)
-											< (targetPoint dist: nearestPoint)])
-								ifTrue: [nearestPoint _ scaledPoint]]].
-	^ nearestPoint! !
-
-!PlotMorph methodsFor: 'event handling' stamp: 'dgd 10/18/2001 16:53'!
-handlesMouseDown: evt 
-	^ processMouseDown! !
-
-!PlotMorph methodsFor: 'initialization' stamp: 'gsa 12/22/2013 12:02'!
-initialize
-	super initialize.
-
-	series := Dictionary new.
-	processMouseDown := true.
-	lens := nil.
-	balloonFormatter := [:aCollection | self textForBalloon: aCollection].
-	self morphExtent: 1 @ 1! !
-
-!PlotMorph methodsFor: 'initialization' stamp: 'jcg 8/30/2003 15:52'!
-initializeCotas
-	"Don't put initial limits on the grid range... default is to compute them from series data."
-
-	super initializeCotas.
-	limitMinX _ limitMaxX _ limitMinY _ limitMaxY _ nil.! !
-
-!PlotMorph methodsFor: 'drawing' stamp: 'dgd 11/2/2001 17:31'!
-maxPoint
-	cachedMaxPoint
-		ifNil: [""
-			limitMaxX notNil & limitMaxY notNil
-				ifTrue: [cachedMaxPoint _ limitMaxY @ limitMaxY]
-				ifFalse: [| maxPoints | 
-					maxPoints _ series
-								collect: [:serie | serie maxPoint]
-								thenSelect: [:point | point notNil].
-					cachedMaxPoint _ maxPoints isEmpty
-								ifTrue: [1 @ 1]
-								ifFalse: [maxPoints max].
-					limitMaxX notNil
-						ifTrue: [cachedMaxPoint _ limitMaxX @ cachedMaxPoint y].
-					limitMaxY notNil
-						ifTrue: [cachedMaxPoint _ cachedMaxPoint x @ limitMaxY]]].
-	^ cachedMaxPoint! !
-
-!PlotMorph methodsFor: 'drawing' stamp: 'dgd 11/2/2001 17:15'!
-minPoint
-	cachedMinPoint
-		ifNil: [""
-			limitMinX notNil & limitMinY notNil
-				ifTrue: [cachedMinPoint _ limitMinX @ limitMinY]
-				ifFalse: [| minPoints | 
-					minPoints _ series
-								collect: [:serie | serie minPoint]
-								thenSelect: [:point | point notNil].
-					cachedMinPoint _ minPoints isEmpty
-								ifTrue: [0 @ 0]
-								ifFalse: [minPoints min].
-					limitMinX notNil
-						ifTrue: [cachedMinPoint _  limitMinX
-										@ cachedMinPoint y].
-					limitMinY notNil
-						ifTrue: [cachedMinPoint _ cachedMinPoint x
-										@ limitMinY]]].
-	^ cachedMinPoint! !
-
-!PlotMorph methodsFor: 'event handling' stamp: 'dgd 7/20/2002 16:08'!
-mouseDown: anEvent 
-	| nearPoint |
-	nearPoint _ self findNearestPointTo: anEvent position - self topLeft - self borderWidth.
-	nearPoint
-		ifNotNil: [anEvent redButtonChanged
-				ifTrue: [self showLensAt: nearPoint]
-				ifFalse: [self exploreExtrasAt: nearPoint]]! !
-
-!PlotMorph methodsFor: 'event handling' stamp: 'dgd 3/25/2003 09:09'!
-mouseUp: anEvent 
-	lens isNil ifTrue:[^ self].
-""
-
-			lens deleteBalloon.
-			lens delete.
-			lens := nil! !
-
-!PlotMorph methodsFor: 'accessing' stamp: 'dgd 10/18/2001 16:57'!
-processMouseDown: aBoolean 
-	processMouseDown _ aBoolean! !
-
-!PlotMorph methodsFor: 'accessing' stamp: 'jcg 8/29/2003 22:53'!
-references: aMorphOrNil
-	"Specifies a morph (if not nil) that is updated with the names of the plotted series, displayed in the same color as the actual plot."
-
-	references _ aMorphOrNil! !
-
-!PlotMorph methodsFor: 'drawing' stamp: 'gsa 12/23/2013 13:58'!
-scalePoints
-	| |
-	scaledPoints _ nil.
-	series
-		do: [:serie | serie
-				scaleTo: self drawBounds
-				height: self morphHeight - (self borderWidth * 2)
-				maxPoint: self maxPoint
-				minPoint: self minPoint]! !
-
-!PlotMorph methodsFor: 'drawing' stamp: 'DGD 6/13/2001 23:58'!
-scaledPoints
-	^ scaledPoints
-		ifNil: [scaledPoints _ Dictionary new.
-			series
-				do: [:serie | serie points
-						do: [:point | 
-							| allPoints | 
-							allPoints _ scaledPoints
-										at: point scaledPoint
-										ifAbsentPut: [OrderedCollection new].
-							allPoints add: point]].
-			scaledPoints]! !
 
 !PlotMorph methodsFor: 'deprecated' stamp: 'gsa 12/28/2013 19:24'!
 serie: aSeriesOrSymbol
@@ -735,9 +598,17 @@ serie: aSymbol width: anInteger
 	" use #series:width: instead this method ".
 	^ self series: aSymbol width: anInteger! !
 
-!PlotMorph methodsFor: 'accessing' stamp: 'gs 11/30/2001 02:51'!
-series
-	^series! !
+!PlotMorph methodsFor: 'deprecated' stamp: 'gsa 12/28/2013 19:28'!
+xAxeFormatter: aFormatterBlock 
+
+	" use #xAxisFormatter: instead this method ".
+	self xAxisFormatter: aFormatterBlock! !
+
+!PlotMorph methodsFor: 'deprecated' stamp: 'gsa 12/28/2013 19:29'!
+yAxeFormatter: aFormatterBlock 
+
+	" use #yxAxisFormatter: instead this method ".
+	self yAxisFormatter: aFormatterBlock! !
 
 !PlotMorph methodsFor: 'series' stamp: 'jcg 8/29/2003 22:33'!
 series: aSeriesOrSymbol 
@@ -822,6 +693,137 @@ series: aSymbol width: anInteger
 	(self series: aSymbol) width: anInteger.
 	self changed! !
 
+!PlotMorph methodsFor: 'drawing' stamp: 'dgd 11/2/2001 17:31'!
+maxPoint
+	cachedMaxPoint
+		ifNil: [""
+			limitMaxX notNil & limitMaxY notNil
+				ifTrue: [cachedMaxPoint _ limitMaxY @ limitMaxY]
+				ifFalse: [| maxPoints | 
+					maxPoints _ series
+								collect: [:serie | serie maxPoint]
+								thenSelect: [:point | point notNil].
+					cachedMaxPoint _ maxPoints isEmpty
+								ifTrue: [1 @ 1]
+								ifFalse: [maxPoints max].
+					limitMaxX notNil
+						ifTrue: [cachedMaxPoint _ limitMaxX @ cachedMaxPoint y].
+					limitMaxY notNil
+						ifTrue: [cachedMaxPoint _ cachedMaxPoint x @ limitMaxY]]].
+	^ cachedMaxPoint! !
+
+!PlotMorph methodsFor: 'drawing' stamp: 'dgd 11/2/2001 17:15'!
+minPoint
+	cachedMinPoint
+		ifNil: [""
+			limitMinX notNil & limitMinY notNil
+				ifTrue: [cachedMinPoint _ limitMinX @ limitMinY]
+				ifFalse: [| minPoints | 
+					minPoints _ series
+								collect: [:serie | serie minPoint]
+								thenSelect: [:point | point notNil].
+					cachedMinPoint _ minPoints isEmpty
+								ifTrue: [0 @ 0]
+								ifFalse: [minPoints min].
+					limitMinX notNil
+						ifTrue: [cachedMinPoint _  limitMinX
+										@ cachedMinPoint y].
+					limitMinY notNil
+						ifTrue: [cachedMinPoint _ cachedMinPoint x
+										@ limitMinY]]].
+	^ cachedMinPoint! !
+
+!PlotMorph methodsFor: 'drawing' stamp: 'gsa 12/23/2013 13:58'!
+scalePoints
+	| |
+	scaledPoints _ nil.
+	series
+		do: [:serie | serie
+				scaleTo: self drawBounds
+				height: self morphHeight - (self borderWidth * 2)
+				maxPoint: self maxPoint
+				minPoint: self minPoint]! !
+
+!PlotMorph methodsFor: 'drawing' stamp: 'DGD 6/13/2001 23:58'!
+scaledPoints
+	^ scaledPoints
+		ifNil: [scaledPoints _ Dictionary new.
+			series
+				do: [:serie | serie points
+						do: [:point | 
+							| allPoints | 
+							allPoints _ scaledPoints
+										at: point scaledPoint
+										ifAbsentPut: [OrderedCollection new].
+							allPoints add: point]].
+			scaledPoints]! !
+
+!PlotMorph methodsFor: 'drawing' stamp: 'gsa 12/28/2013 20:18'!
+updateForm
+	"Override superclass implementation to do drawing of data."
+	| canvas |
+
+	self updateReferences.
+	self updateCotas.
+	self scalePoints.
+	canvas _ form getCanvas.
+	
+	" canvas rounded. "
+		
+	
+	grid drawOn: canvas.
+	(series values
+		asSortedCollection: [:x :y | x name <= y name])
+		do: [:serie | serie drawOn: canvas].
+! !
+
+!PlotMorph methodsFor: 'drawing' stamp: 'jcg 8/29/2003 22:55'!
+updateReferences
+	"Update a 'legend' displaying the description of each plotted series in the same color as that series."
+	| seriesWithDescription sortedSeried |
+	references isNil
+		ifTrue: [^ self].
+	""
+	references removeAllMorphs.
+""
+	seriesWithDescription := series
+				reject: [:each | each description isEmpty].
+	sortedSeried := seriesWithDescription
+				asSortedCollection: [:x :y | x description asLowercase <= y description asLowercase].
+	sortedSeried
+		do: [:serie | 
+			| ref | 
+			ref := StringMorph new.
+			ref contents: serie description.
+			ref color: serie color.
+			references addMorphBack: ref.
+			serie]! !
+
+!PlotMorph methodsFor: 'private' stamp: 'DGD 6/28/2001 14:50'!
+exploreExtrasAt: nearPoint 
+	| extras |
+	extras _ (self scaledPoints at: nearPoint)
+				collect: [:each | each extra].
+	extras _ extras
+				select: [:each | each notNil].
+
+extras isEmpty ifFalse:[
+	extras explore]! !
+
+!PlotMorph methodsFor: 'private' stamp: 'DGD 6/14/2001 00:04'!
+findNearestPointTo: targetPoint 
+	| nearestPoint |
+	nearestPoint _ nil.
+	Cursor wait
+				showWhile: [""
+					self scaledPoints
+						keysDo: [:scaledPoint | ""
+							(nearestPoint isNil
+									or: [(targetPoint dist: scaledPoint)
+											< (targetPoint dist: nearestPoint)])
+								ifTrue: [nearestPoint _ scaledPoint]]].
+	^ nearestPoint! !
+
 !PlotMorph methodsFor: 'private' stamp: 'dgd 3/25/2003 09:09'!
 seriesChanged
 	cachedMaxPoint := nil.
@@ -865,58 +867,51 @@ textForBalloon: aCollection
 		separatedBy: [stream nextPut: Character cr].
 	^ stream contents! !
 
-!PlotMorph methodsFor: 'drawing' stamp: 'gsa 12/28/2013 20:18'!
-updateForm
-	"Override superclass implementation to do drawing of data."
-	| canvas |
+!PlotMorph methodsFor: 'initialization' stamp: 'gsa 12/22/2013 12:02'!
+initialize
+	super initialize.
 
-	self updateReferences.
-	self updateCotas.
-	self scalePoints.
-	canvas _ form getCanvas.
-	
-	" canvas rounded. "
-		
-	
-	grid drawOn: canvas.
-	(series values
-		asSortedCollection: [:x :y | x name <= y name])
-		do: [:serie | serie drawOn: canvas].
-! !
+	series := Dictionary new.
+	processMouseDown := true.
+	lens := nil.
+	balloonFormatter := [:aCollection | self textForBalloon: aCollection].
+	self morphExtent: 1 @ 1! !
 
-!PlotMorph methodsFor: 'drawing' stamp: 'jcg 8/29/2003 22:55'!
-updateReferences
-	"Update a 'legend' displaying the description of each plotted series in the same color as that series."
-	| seriesWithDescription sortedSeried |
-	references isNil
-		ifTrue: [^ self].
-	""
-	references removeAllMorphs.
+!PlotMorph methodsFor: 'initialization' stamp: 'jcg 8/30/2003 15:52'!
+initializeCotas
+	"Don't put initial limits on the grid range... default is to compute them from series data."
+
+	super initializeCotas.
+	limitMinX _ limitMaxX _ limitMinY _ limitMaxY _ nil.! !
+
+!PlotMorph methodsFor: 'event handling' stamp: 'dgd 10/18/2001 16:53'!
+handlesMouseDown: evt 
+	^ processMouseDown! !
+
+!PlotMorph methodsFor: 'event handling' stamp: 'dgd 7/20/2002 16:08'!
+mouseDown: anEvent 
+	| nearPoint |
+	nearPoint _ self findNearestPointTo: anEvent position - self topLeft - self borderWidth.
+	nearPoint
+		ifNotNil: [anEvent redButtonChanged
+				ifTrue: [self showLensAt: nearPoint]
+				ifFalse: [self exploreExtrasAt: nearPoint]]! !
+
+!PlotMorph methodsFor: 'event handling' stamp: 'dgd 3/25/2003 09:09'!
+mouseUp: anEvent 
+	lens isNil ifTrue:[^ self].
 ""
-	seriesWithDescription := series
-				reject: [:each | each description isEmpty].
-	sortedSeried := seriesWithDescription
-				asSortedCollection: [:x :y | x description asLowercase <= y description asLowercase].
-	sortedSeried
-		do: [:serie | 
-			| ref | 
-			ref := StringMorph new.
-			ref contents: serie description.
-			ref color: serie color.
-			references addMorphBack: ref.
-			serie]! !
 
-!PlotMorph methodsFor: 'deprecated' stamp: 'gsa 12/28/2013 19:28'!
-xAxeFormatter: aFormatterBlock 
+			lens deleteBalloon.
+			lens delete.
+			lens := nil! !
 
-	" use #xAxisFormatter: instead this method ".
-	self xAxisFormatter: aFormatterBlock! !
-
-!PlotMorph methodsFor: 'deprecated' stamp: 'gsa 12/28/2013 19:29'!
-yAxeFormatter: aFormatterBlock 
-
-	" use #yxAxisFormatter: instead this method ".
-	self yAxisFormatter: aFormatterBlock! !
+!PlotMorph methodsFor: 'change reporting' stamp: 'jcg 8/30/2003 11:54'!
+changed
+	
+	cachedMaxPoint _ nil.
+	cachedMinPoint _ nil.
+	super changed! !
 
 !PlotMorph class methodsFor: 'instance creation' stamp: 'gsa 12/27/2013 14:05'!
 plotPoints: aPointOrderedCollection 
@@ -934,12 +929,6 @@ plotPoints: aPointOrderedCollection
 			plotMorph series: #series addPoint: e].
 	plotMorph openInWorld.
 	^ plotMorph! !
-
-!PlotMorph class methodsFor: 'deprecated' stamp: 'jcg 8/29/2003 16:35'!
-plotSerie: aPointOrderedCollection 
-
-	self deprecatedExplanation: 'use #plotSeries: instead'.
-	^ self plotSeries: aPointOrderedCollection! !
 
 !PlotMorph class methodsFor: 'instance creation' stamp: 'gsa 12/27/2013 14:05'!
 plotSeries: aPointOrderedCollection 
@@ -1112,6 +1101,12 @@ testWithReferences
 	ref openInWorld.
 	pm openInWorld! !
 
+!PlotMorph class methodsFor: 'deprecated' stamp: 'jcg 8/29/2003 16:35'!
+plotSerie: aPointOrderedCollection 
+
+	self deprecatedExplanation: 'use #plotSeries: instead'.
+	^ self plotSeries: aPointOrderedCollection! !
+
 !PlotMorphGrid methodsFor: 'drawing' stamp: 'dgd 7/20/2002 16:31'!
 bestStep: aNumber 
 	"answer the best step for grid drawing"
@@ -1126,10 +1121,6 @@ bestStep: aNumber
 			(step between: 25 and: 100)
 				ifTrue: [bestStep _ step]].
 	^ bestStep! !
-
-!PlotMorphGrid methodsFor: 'accessing' stamp: 'dgd 10/16/2001 14:46'!
-drawAxis: aBoolean 
-	drawAxis _ aBoolean! !
 
 !PlotMorphGrid methodsFor: 'drawing' stamp: 'jcg 8/30/2003 13:06'!
 drawAxisOn: aCanvas 
@@ -1219,6 +1210,10 @@ initialize
 initializeOn: aPlotMorph
 plot _ aPlotMorph! !
 
+!PlotMorphGrid methodsFor: 'accessing' stamp: 'dgd 10/16/2001 14:46'!
+drawAxis: aBoolean 
+	drawAxis _ aBoolean! !
+
 !PlotMorphGrid class methodsFor: 'instance creation' stamp: 'gsa 12/22/2013 11:45'!
 new
 	^ super new initialize! !
@@ -1227,20 +1222,6 @@ new
 on: aPlotMorph
 	^ self new initializeOn: aPlotMorph! !
 
-!PlotSeries methodsFor: 'points' stamp: 'DGD 6/13/2001 23:30'!
-addPoint: aPoint 
-	points
-		add: (PlotPoint at: aPoint serie: self)! !
-
-!PlotSeries methodsFor: 'points' stamp: 'DGD 6/13/2001 23:31'!
-addPoint: aPoint extra:anObject
-	points
-		add: (PlotPoint at: aPoint serie: self extra:anObject)! !
-
-!PlotSeries methodsFor: 'accessing-color' stamp: 'dgd 7/20/2002 12:48'!
-areaColor
-	^ color alpha: 0.25! !
-
 !PlotSeries methodsFor: 'accessing' stamp: 'DGD 6/14/2001 00:53'!
 clear
 points _ OrderedCollection new! !
@@ -1248,10 +1229,6 @@ points _ OrderedCollection new! !
 !PlotSeries methodsFor: 'accessing' stamp: 'dgd 10/18/2001 12:54'!
 color
 	^color! !
-
-!PlotSeries methodsFor: 'accessing-color' stamp: 'DGD 6/14/2001 00:27'!
-color: anObject
-	color _ anObject! !
 
 !PlotSeries methodsFor: 'accessing' stamp: 'dgd 10/18/2001 14:31'!
 description
@@ -1268,6 +1245,95 @@ drawArea: aBoolean
 !PlotSeries methodsFor: 'accessing' stamp: 'DGD 7/5/2001 12:01'!
 drawLine: aBoolean 
 	drawLine _ aBoolean! !
+
+!PlotSeries methodsFor: 'accessing' stamp: 'DGD 7/3/2001 16:32'!
+drawPoints: aBoolean 
+	drawPoints _ aBoolean! !
+
+!PlotSeries methodsFor: 'accessing' stamp: 'DGD 6/14/2001 00:51'!
+name
+	^ name! !
+
+!PlotSeries methodsFor: 'accessing' stamp: 'DGD 6/14/2001 00:20'!
+points
+	^points! !
+
+!PlotSeries methodsFor: 'accessing' stamp: 'DGD 7/5/2001 12:33'!
+type: aSymbol 
+	"Line Type (#straightened, #stepped)"
+	type _ aSymbol! !
+
+!PlotSeries methodsFor: 'accessing' stamp: 'DGD 6/14/2001 01:19'!
+width: anObject
+	width _ anObject! !
+
+!PlotSeries methodsFor: 'initialization' stamp: 'dgd 7/20/2002 12:25'!
+initializeName: aString 
+	name _ aString.
+	""
+	color _ Color black.
+
+	""
+	width _ 1.
+	drawPoints _ true.
+	drawLine _ true.
+	drawArea _ false.
+	type _ #straightened.
+	points _ OrderedCollection new! !
+
+!PlotSeries methodsFor: 'points' stamp: 'DGD 6/13/2001 23:30'!
+addPoint: aPoint 
+	points
+		add: (PlotPoint at: aPoint serie: self)! !
+
+!PlotSeries methodsFor: 'points' stamp: 'DGD 6/13/2001 23:31'!
+addPoint: aPoint extra:anObject
+	points
+		add: (PlotPoint at: aPoint serie: self extra:anObject)! !
+
+!PlotSeries methodsFor: 'points' stamp: 'dgd 10/15/2001 18:30'!
+maxPoint
+	^ points isEmpty
+		ifTrue: [nil]
+		ifFalse: [points max]! !
+
+!PlotSeries methodsFor: 'points' stamp: 'dgd 10/15/2001 18:30'!
+minPoint
+	^ points isEmpty
+		ifTrue: [nil]
+		ifFalse: [points min]! !
+
+!PlotSeries methodsFor: 'points' stamp: 'dgd 3/25/2003 09:41'!
+scaleTo: anRectangle height: heightInteger maxPoint: maxPoint minPoint: minPoint 
+	| drawExtent scaleFrom scaleTo|
+	drawExtent := 1 @ 1 max: maxPoint - minPoint.
+	drawExtent isZero ifTrue:[^ self].
+""
+
+			scaleFrom := 0 @ 0 rect: drawExtent.
+			scaleTo := anRectangle.
+			points do: 
+					[:point | 
+					| tempPoint |
+					tempPoint := point - minPoint scaleFrom: scaleFrom to: scaleTo.
+					point scaledPoint: tempPoint x @ (heightInteger - tempPoint y)]! !
+
+!PlotSeries methodsFor: 'accessing-color' stamp: 'dgd 7/20/2002 12:48'!
+areaColor
+	^ color alpha: 0.25! !
+
+!PlotSeries methodsFor: 'accessing-color' stamp: 'DGD 6/14/2001 00:27'!
+color: anObject
+	color _ anObject! !
+
+!PlotSeries methodsFor: 'accessing-color' stamp: 'dgd 7/20/2002 12:49'!
+lineColor
+	^ color
+		alpha: 0.85! !
+
+!PlotSeries methodsFor: 'accessing-color' stamp: 'dgd 7/20/2002 12:47'!
+pointColor
+	^ color twiceLighter alpha: 0.85! !
 
 !PlotSeries methodsFor: 'drawing' stamp: 'dgd 10/15/2001 18:10'!
 drawOn: aCanvas 
@@ -1288,10 +1354,6 @@ drawOn: aCanvas
 						ifTrue: [self drawSteppedLineOn: aCanvas]].
 			drawPoints
 				ifTrue: [self drawPointsOn: aCanvas]! !
-
-!PlotSeries methodsFor: 'accessing' stamp: 'DGD 7/3/2001 16:32'!
-drawPoints: aBoolean 
-	drawPoints _ aBoolean! !
 
 !PlotSeries methodsFor: 'drawing' stamp: 'gsa 12/27/2013 14:12'!
 drawPointsOn: aCanvas 
@@ -1380,49 +1442,6 @@ drawStraightenedLineOn: aCanvas
 						color: lineColor].
 			lastScaledPoint _ scaledPoint]! !
 
-!PlotSeries methodsFor: 'initialization' stamp: 'dgd 7/20/2002 12:25'!
-initializeName: aString 
-	name _ aString.
-	""
-	color _ Color black.
-
-	""
-	width _ 1.
-	drawPoints _ true.
-	drawLine _ true.
-	drawArea _ false.
-	type _ #straightened.
-	points _ OrderedCollection new! !
-
-!PlotSeries methodsFor: 'accessing-color' stamp: 'dgd 7/20/2002 12:49'!
-lineColor
-	^ color
-		alpha: 0.85! !
-
-!PlotSeries methodsFor: 'points' stamp: 'dgd 10/15/2001 18:30'!
-maxPoint
-	^ points isEmpty
-		ifTrue: [nil]
-		ifFalse: [points max]! !
-
-!PlotSeries methodsFor: 'points' stamp: 'dgd 10/15/2001 18:30'!
-minPoint
-	^ points isEmpty
-		ifTrue: [nil]
-		ifFalse: [points min]! !
-
-!PlotSeries methodsFor: 'accessing' stamp: 'DGD 6/14/2001 00:51'!
-name
-	^ name! !
-
-!PlotSeries methodsFor: 'accessing-color' stamp: 'dgd 7/20/2002 12:47'!
-pointColor
-	^ color twiceLighter alpha: 0.85! !
-
-!PlotSeries methodsFor: 'accessing' stamp: 'DGD 6/14/2001 00:20'!
-points
-	^points! !
-
 !PlotSeries methodsFor: 'printing' stamp: 'DGD 7/5/2001 12:00'!
 printOn: aStream 
 	aStream nextPutAll: 'Serie:';
@@ -1438,111 +1457,95 @@ printOn: aStream
 		 nextPutAll: ', drawArea:';
 		 nextPutAll: drawArea asString! !
 
-!PlotSeries methodsFor: 'points' stamp: 'dgd 3/25/2003 09:41'!
-scaleTo: anRectangle height: heightInteger maxPoint: maxPoint minPoint: minPoint 
-	| drawExtent scaleFrom scaleTo|
-	drawExtent := 1 @ 1 max: maxPoint - minPoint.
-	drawExtent isZero ifTrue:[^ self].
-""
-
-			scaleFrom := 0 @ 0 rect: drawExtent.
-			scaleTo := anRectangle.
-			points do: 
-					[:point | 
-					| tempPoint |
-					tempPoint := point - minPoint scaleFrom: scaleFrom to: scaleTo.
-					point scaledPoint: tempPoint x @ (heightInteger - tempPoint y)]! !
-
-!PlotSeries methodsFor: 'accessing' stamp: 'DGD 7/5/2001 12:33'!
-type: aSymbol 
-	"Line Type (#straightened, #stepped)"
-	type _ aSymbol! !
-
-!PlotSeries methodsFor: 'accessing' stamp: 'DGD 6/14/2001 01:19'!
-width: anObject
-	width _ anObject! !
-
 !PlotSeries class methodsFor: 'instance creation' stamp: 'DGD 6/13/2001 23:45'!
 name: aString 
 	^ self new
 		initializeName: aString
 		! !
 
-!PlotPoint methodsFor: 'comparing' stamp: 'dgd 10/11/2003 21:16'!
-= anObject 
-	^ super = anObject
-		and: [series = anObject series
-				and: [extra = anObject extra]]! !
+!Integer methodsFor: '*Plot-Morph' stamp: 'gsa 1/16/2014 20:06'!
+asStringWithCommas
+	"123456789 asStringWithCommas"
+	"-123456789 asStringWithCommas"
+	^ self asStringWithCommasSigned: false! !
 
-!PlotPoint methodsFor: 'accessing' stamp: 'DGD 5/27/2001 23:29'!
-extra
-	^extra! !
+!Integer methodsFor: '*Plot-Morph' stamp: 'gsa 1/16/2014 20:07'!
+asStringWithCommasSigned: aBoolean
+	"123456789 asStringWithCommasSigned: true"
+	"-123456789 asStringWithCommasSigned: false"
+	| digits |
+	digits := self abs printString.
+	^ String streamContents:
+		[:strm | 
+		self sign = -1 ifTrue: [strm nextPut: $-] ifFalse: [aBoolean ifTrue: [strm nextPut: $+]].
+		1 to: digits size do: 
+			[:i | strm nextPut: (digits at: i).
+			(i < digits size and: [(i - digits size) \\ 3 = 0])
+				ifTrue: [strm nextPut: $,]]]! !
 
-!PlotPoint methodsFor: 'comparing' stamp: 'dgd 10/11/2003 21:15'!
-hash
-	^ super hash
-		bitXor: (series hash bitXor: extra hash)! !
+!Point methodsFor: '*Plot-Morph' stamp: 'gsa 12/22/2013 19:55'!
+scaleFrom: rect1 to: rect2
+	"Produce a point stretched according to the stretch from rect1 to rect2"
+	^ rect2 topLeft + (((x-rect1 left) * rect2 width // rect1 width)
+					@ ((y-rect1 top) * rect2 height // rect1 height))! !
 
-!PlotPoint methodsFor: 'initialization' stamp: 'DGD 5/28/2001 01:41'!
-initialize
-scaledPoint _ self! !
+!Morph methodsFor: '*Plot-Morph' stamp: 'gsa 12/22/2013 13:00'!
+borderWidth
+	^self morphWidth! !
 
-!PlotPoint methodsFor: 'initialization' stamp: 'dgd 10/11/2003 21:16'!
-initializeAt: aPoint series: aPlotSeries 
-	self setX: aPoint x setY: aPoint y.
-	series := aPlotSeries! !
+!Morph methodsFor: '*Plot-Morph' stamp: 'gsa 12/22/2013 19:50'!
+bounds
 
-!PlotPoint methodsFor: 'initialization' stamp: 'dgd 10/11/2003 21:16'!
-initializeAt: aPoint series: aPlotSeries extra: anObject 
-	self setX: aPoint x setY: aPoint y.
-	series := aPlotSeries.
-	extra := anObject! !
+" ojo, este es el que da errores al evaluar los test2, test4.
+Si devuelvo location da el error de falta de insetBy: en Matrix2x3, si devuelvo location position da el mismo error pero para Point,
+ver en Squeak que tipo de objeto devuelve bounds"
 
-!PlotPoint methodsFor: 'printing' stamp: 'dgd 10/11/2003 21:16'!
-printOn: aStream 
-	super printOn: aStream.
-	aStream nextPutAll: ' series:(';
-		 print: series;
-		 nextPutAll: ') scaled:';
-		 print: scaledPoint.
-	extra isNil
-		ifFalse: [aStream nextPutAll: ' extra:';
-				 print: extra]! !
+	"^ location position"
+	^ self morphBoundsInWorld! !
 
-!PlotPoint methodsFor: 'accessing' stamp: 'dgd 9/19/2001 22:58'!
-scaledPoint
-	^ scaledPoint ifNil:[self]! !
+!Morph methodsFor: '*Plot-Morph' stamp: 'gsa 12/22/2013 19:51'!
+topLeft
 
-!PlotPoint methodsFor: 'accessing' stamp: 'DGD 5/27/2001 18:23'!
-scaledPoint: anObject
-	scaledPoint _ anObject! !
+	" original "
+	"^ bounds topLeft"
+	"^ location position"
+	^ 0@0! !
 
-!PlotPoint methodsFor: 'accessing' stamp: 'dgd 10/11/2003 21:16'!
-series
-	^ series! !
+!MorphicCanvas methodsFor: '*Plot-Morph' stamp: 'gsa 3/7/2018 21:04:31'!
+drawPolygon: vertices color: aColor borderWidth: bw borderColor: bc
+	"Generalize for the BalloonCanvas"
+	^self drawPolygon: vertices fillStyle: aColor borderWidth: bw borderColor: bc! !
 
-!PlotPoint class methodsFor: 'instance creation' stamp: 'dgd 10/11/2003 21:15'!
-at: aPoint serie: aPlotSerie 
-	^ self new initializeAt: aPoint series: aPlotSerie! !
+!MorphicCanvas methodsFor: '*Plot-Morph' stamp: 'gsa 3/7/2018 21:05:08'!
+drawPolygon: vertices fillStyle: aFillStyle borderWidth: bw borderColor: bc
+	"Fill the given polygon.
+	Note: The default implementation does not recognize any enhanced fill styles"
+	self drawPolygon: vertices color: aFillStyle borderWidth: bw borderColor: bc! !
 
-!PlotPoint class methodsFor: 'instance creation' stamp: 'DGD 6/13/2001 19:26'!
-at: aPoint serie: aPlotSerie extra: anObject 
-	^ self new
-		initializeAt: aPoint
-		serie: aPlotSerie
-		extra: anObject! !
+!MorphicCanvas methodsFor: '*Plot-Morph' stamp: 'gsa 3/7/2018 21:05:47'!
+image: aForm at: aPoint rule: combinationRule
+	"Note: This protocol is deprecated. Use one of the explicit image drawing messages (#paintImage, #drawImage) instead."
+	self image: aForm
+		at: aPoint
+		sourceRect: aForm boundingBox
+		rule: combinationRule.! !
 
-!PlotPoint class methodsFor: 'instance creation' stamp: 'dgd 10/11/2003 21:14'!
-at: aPoint series: aPlotSeries
-	^ self new initializeAt: aPoint series: aPlotSeries! !
+!MorphicCanvas methodsFor: '*Plot-Morph' stamp: 'gsa 3/7/2018 21:07:18'!
+image: aForm at: aPoint sourceRect: sourceRect rule: rule 
+	"Draw the portion of the given Form defined by sourceRect at the given point using the given BitBlt combination rule."
 
-!PlotPoint class methodsFor: 'instance creation' stamp: 'dgd 10/11/2003 21:14'!
-at: aPoint series: aPlotSeries extra: anObject 
-	^ self new
-		initializeAt: aPoint
-		series: aPlotSeries
-		extra: anObject! !
+"ojo origin ver de donde viene y sacarlo como declarado para el método"
 
-!PlotPoint class methodsFor: 'instance creation' stamp: 'DGD 5/28/2001 01:41'!
-new
-^super new initialize! !
+"tuve que declarar port local también"
+
+	| origin port |
+	origin := Point x: 0 y: 0.
+	port colorMap: (aForm colormapIfNeededFor: form); fillColor: nil.
+	port image: aForm at: aPoint + origin sourceRect: sourceRect rule: rule.
+	(form depth = 32 and: [aForm depth = 16])
+		ifTrue: [port image: nil at: aPoint + origin sourceRect: sourceRect rule: 40 "fixAlpha:with:"].! !
+
+!MorphicCanvas methodsFor: '*Plot-Morph' stamp: 'gsa 3/7/2018 21:08:00'!
+line: pt1 to: pt2 color: c
+
+	self line: pt1 to: pt2 width: 1 color: c.! !
