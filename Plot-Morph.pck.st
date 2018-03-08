@@ -1,6 +1,6 @@
-'From Cuis 5.0 of 7 November 2016 [latest update: #3267] on 7 March 2018 at 9:22:10 pm'!
+'From Cuis 5.0 of 7 November 2016 [latest update: #3267] on 8 March 2018 at 3:02:48 pm'!
 'Description Please enter a description for this package'!
-!provides: 'Plot-Morph' 1 13!
+!provides: 'Plot-Morph' 1 14!
 SystemOrganization addCategory: #'Plot-Morph'!
 
 
@@ -102,9 +102,9 @@ I'm a serie of a PlotMorph!
 initialize
 scaledPoint _ self! !
 
-!PlotPoint methodsFor: 'initialization' stamp: 'dgd 10/11/2003 21:16'!
+!PlotPoint methodsFor: 'initialization' stamp: 'gsa 3/8/2018 14:36:21'!
 initializeAt: aPoint series: aPlotSeries 
-	self setX: aPoint x setY: aPoint y.
+	self privateSetX: aPoint x setY: aPoint y.
 	series := aPlotSeries! !
 
 !PlotPoint methodsFor: 'initialization' stamp: 'dgd 10/11/2003 21:16'!
@@ -1530,7 +1530,7 @@ image: aForm at: aPoint rule: combinationRule
 		sourceRect: aForm boundingBox
 		rule: combinationRule.! !
 
-!MorphicCanvas methodsFor: '*Plot-Morph' stamp: 'gsa 3/7/2018 21:07:18'!
+!MorphicCanvas methodsFor: '*Plot-Morph' stamp: 'gsa 3/8/2018 14:52:29'!
 image: aForm at: aPoint sourceRect: sourceRect rule: rule 
 	"Draw the portion of the given Form defined by sourceRect at the given point using the given BitBlt combination rule."
 
@@ -1540,7 +1540,7 @@ image: aForm at: aPoint sourceRect: sourceRect rule: rule
 
 	| origin port |
 	origin := Point x: 0 y: 0.
-	port colorMap: (aForm colormapIfNeededFor: form); fillColor: nil.
+	" port colorMap: (aForm colormapIfNeededFor: form); fillColor: nil. "
 	port image: aForm at: aPoint + origin sourceRect: sourceRect rule: rule.
 	(form depth = 32 and: [aForm depth = 16])
 		ifTrue: [port image: nil at: aPoint + origin sourceRect: sourceRect rule: 40 "fixAlpha:with:"].! !
